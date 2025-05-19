@@ -1,7 +1,7 @@
 const express = require('express');
-const ethers = require('ethers');
 const dotenv = require('dotenv');
 const cors = require('cors');
+let ethers;
 
 dotenv.config();
 
@@ -102,8 +102,9 @@ function getAllowlistProof(walletAddress) {
 // Provider and signer
 let contract;
 
-provider.getNetwork().then((network) => {
+provider.getNetwork().then(async (network) => {
   console.log("Chain ID:", network.chainId);
+  ethers = require('ethers');
   // Contract instance
   contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 });
