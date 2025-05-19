@@ -110,18 +110,9 @@ app.post('/claim', async (req, res) => {
      const quantity = ethers.BigNumber.from(req.body.quantity.toString());
  
      // Verify the signature
-     // Verify the signature
      let recoveredAddress;
      try {
-       const message = JSON.stringify({
-         action: "claim",
-         walletAddress: walletAddress,
-         quantity: quantity.toString(),
-         contractAddress: CONTRACT_ADDRESS,
-         currency: currency || "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-         pricePerToken: pricePerToken?.toString() || "0",
-         data: data || "0x"
-       });
+       const message = `{"action":"claim","walletAddress":"${walletAddress}","quantity":"${quantity.toString()}","contractAddress":"${CONTRACT_ADDRESS}","currency":"${currency || "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}","pricePerToken":"${pricePerToken?.toString() || "0"}","data":"${data || "0x"}"}`;
        console.log("Verification Message:", message);
        console.log("Signature:", signature);
        console.log("Expected Address:", walletAddress);
