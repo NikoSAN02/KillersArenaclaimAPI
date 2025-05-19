@@ -100,9 +100,10 @@ function getAllowlistProof(walletAddress) {
 }
 // Provider and signer
 const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
 // Contract instance
-const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
 app.post('/claim', async (req, res) => {
   try {
