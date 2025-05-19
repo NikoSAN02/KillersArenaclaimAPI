@@ -117,7 +117,10 @@ app.post('/claim', async (req, res) => {
          action: "claim",
          walletAddress: walletAddress,
          quantity: quantity.toString(),
-         contractAddress: CONTRACT_ADDRESS
+         contractAddress: CONTRACT_ADDRESS,
+         currency: currency || "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+         pricePerToken: pricePerToken?.toString() || "0",
+         data: data || "0x"
        });
        console.log("Verification Message:", message);
        console.log("Signature:", signature);
