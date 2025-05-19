@@ -74,6 +74,28 @@ const CONTRACT_ABI = [
   }
 ];
 
+// Simulate allowlist data
+const allowlist = {
+  "0xf041755c27200f347589a9c0cb0fa6e2d873049a": {
+    proof: [],
+    quantityLimitPerWallet: "0",
+    pricePerToken: "0",
+    currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  },
+};
+
+function getAllowlistProof(walletAddress) {
+  if (allowlist[walletAddress]) {
+    return allowlist[walletAddress];
+  } else {
+    return {
+      proof: [],
+      quantityLimitPerWallet: "0",
+      pricePerToken: "0",
+      currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    };
+  }
+}
 // Provider and signer
 const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
 
@@ -82,36 +104,39 @@ const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
 app.post('/claim', async (req, res) => {
   try {
-    const { signature, walletAddress, quantity, currency, pricePerToken, allowlistProof, data } = req.body;
-
-    // Verify the signature
-    const messageHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Claim message")); // Replace with the actual message used for signing
-    const recoveredAddress = ethers.utils.verifyMessage(ethers.utils.arrayify(messageHash), signature);
-
-    if (recoveredAddress.toLowerCase() !== walletAddress.toLowerCase()) {
-      return res.status(400).json({ error: 'Invalid signature' });
-    }
-
-    // Call the claim function
-    const tx = await contract.claim(
-      walletAddress,
-      quantity,
-      currency,
-      pricePerToken,
-      allowlistProof,
-      data,
-      {
-        value: ethers.BigNumber.from(pricePerToken).mul(ethers.BigNumber.from(quantity)),
-      }
-    );
-    await tx.wait();
-
-    res.json({ transactionHash: tx.hash });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
-  }
-});
+     const { signature, walletAddress, quantity, currency, pricePerToken, data } = req.body;
+ 
+     // Verify the signature
+     const messageHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Claim message")); // Replace with the actual message used for signing
+     const recoveredAddress = ethers.utils.verifyMessage(ethers.utils.arrayify(messageHash), signature);
+ 
+     if (recoveredAddress.toLowerCase() !== walletAddress.toLowerCase()) {
+       return res.status(400).json({ error: 'Invalid signature' });
+     }
+ 
+     // Simulate fetching allowlist proof
+     const allowlistProof = getAllowlistProof(walletAddress);
+ 
+     // Call the claim function
+     const tx = await contract.claim(
+       walletAddress,
+       quantity,
+       currency,
+       pricePerToken,
+       allowlistProof,
+       data,
+       {
+         value: ethers.BigNumber.from(pricePerToken).mul(ethers.BigNumber.from(quantity)),
+       }
+     );
+     await tx.wait();
+ 
+     res.json({ transactionHash: tx.hash });
+   } catch (error) {
+     console.error(error);
+     res.status(500).json({ error: error.message });
+   }
+ });
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
