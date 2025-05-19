@@ -112,10 +112,14 @@ app.post('/claim', async (req, res) => {
      // Verify the signature
      let recoveredAddress;
      try {
-       const message = `{"action":"claim","walletAddress":"${walletAddress}","quantity":"${quantity.toString()}","contractAddress":"${CONTRACT_ADDRESS}","currency":"${currency || "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}","pricePerToken":"${pricePerToken?.toString() || "0"}","data":"${data || "0x"}"}`;
+       const message = `{"action":"claim","walletAddress":"${walletAddress}","quantity":${quantity.toString()},"contractAddress":"0x836aDb3bf548f6cEaBA20FC267c56EB85dC0D369","currency":"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","pricePerToken":"0","data":"0x"}`;
+       console.log("Raw message string:", message);
        console.log("Verification Message:", message);
        console.log("Signature:", signature);
        console.log("Expected Address:", walletAddress);
+       // Hash and verify the message
+       const messageHash = ethers.utils.hashMessage(message);
+       console.log("Message hash:", messageHash);
        recoveredAddress = ethers.utils.verifyMessage(message, signature);
        console.log("Recovered address:", recoveredAddress);
      } catch (error) {
