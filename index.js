@@ -112,9 +112,16 @@ app.post('/claim', async (req, res) => {
      // Verify the signature
      let recoveredAddress;
      try {
-       const messageHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Claim message")); // Replace with the actual message used for signing
+       const message = JSON.stringify({
+         action: "claim",
+         walletAddress: walletAddress,
+         quantity: quantity,
+         contractAddress: CONTRACT_ADDRESS
+       });
+       console.log("Verification Message:", message);
        console.log("Signature:", signature);
-       recoveredAddress = ethers.utils.verifyMessage(ethers.utils.arrayify(messageHash), signature);
+       console.log("Expected Address:", walletAddress);
+       recoveredAddress = ethers.utils.verifyMessage(message, signature);
        console.log("Recovered address:", recoveredAddress);
      } catch (error) {
        console.error("Invalid signature format:", error);
