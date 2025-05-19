@@ -1,7 +1,7 @@
 const express = require('express');
+const ethers = require('ethers');
 const dotenv = require('dotenv');
 const cors = require('cors');
-let ethers;
 
 dotenv.config();
 
@@ -82,7 +82,7 @@ const allowlist = {
     proof: [],
     quantityLimitPerWallet: "0",
     pricePerToken: "0",
-    currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
   },
 };
 
@@ -93,22 +93,16 @@ function getAllowlistProof(walletAddress) {
     return {
       proof: [],
       quantityLimitPerWallet: "0",
-    pricePerToken: "0",
-      currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      pricePerToken: "0",
+      currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
     };
   }
 }
-
 // Provider and signer
-let contract;
+const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
 
-provider.getNetwork().then(async (network) => {
-  console.log("Chain ID:", network.chainId);
-  ethers = require('ethers');
-  // Contract instance
-  contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-});
-
+// Contract instance
+const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
 app.post('/claim', async (req, res) => {
   try {
@@ -116,12 +110,9 @@ app.post('/claim', async (req, res) => {
  
      // Verify the signature
      // Verify the signature
-     // Verify the signature
      let recoveredAddress;
      try {
-       const message = "Claim message"; // The message used for signing
-       const messageHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(message));
-       console.log("Message Hash:", messageHash);
+       const messageHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Claim message")); // Replace with the actual message used for signing
        console.log("Signature:", signature);
        recoveredAddress = ethers.utils.verifyMessage(ethers.utils.arrayify(messageHash), signature);
        console.log("Recovered address:", recoveredAddress);
