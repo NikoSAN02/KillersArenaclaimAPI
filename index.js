@@ -106,7 +106,8 @@ const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
 app.post('/claim', async (req, res) => {
   try {
-     const { signature, walletAddress, quantity, currency, pricePerToken, data } = req.body;
+     const { signature, walletAddress, currency, pricePerToken, data } = req.body;
+     const quantity = ethers.BigNumber.from(req.body.quantity.toString());
  
      // Verify the signature
      // Verify the signature
@@ -115,7 +116,7 @@ app.post('/claim', async (req, res) => {
        const message = JSON.stringify({
          action: "claim",
          walletAddress: walletAddress,
-         quantity: quantity,
+         quantity: quantity.toString(),
          contractAddress: CONTRACT_ADDRESS
        });
        console.log("Verification Message:", message);
