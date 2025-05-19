@@ -98,63 +98,49 @@ function getAllowlistProof(walletAddress) {
     };
   }
 }
-// Provider and signer
+// Provider
 const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
+// Initialize signer if PRIVATE_KEY is available
+let signer;
+try {
+  if (!process.env.PRIVATE_KEY) {
+    throw new Error('PRIVATE_KEY not found in environment variables');
+  }
+  signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+} catch (error) {
+  console.error('Signer initialization error:', error.message);
+  signer = provider; // Fallback to provider if signer fails
+}
 
 // Contract instance
 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
 app.post('/claim', async (req, res) => {
   try {
-     const { signature, walletAddress, currency, pricePerToken, data } = req.body;
-     const quantity = ethers.BigNumber.from(req.body.quantity.toString());
- 
-     // Verify the signature
-     let recoveredAddress;
-     try {
-       const message = `{"action":"claim","walletAddress":"${walletAddress}","quantity":${quantity.toString()},"contractAddress":"0x836aDb3bf548f6cEaBA20FC267c56EB85dC0D369","currency":"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","pricePerToken":"0","data":"0x"}`;
-       console.log("Raw message string:", message);
-       console.log("Verification Message:", message);
-       console.log("Signature:", signature);
-       console.log("Expected Address:", walletAddress);
-       // Hash and verify the message
-       const messageHash = ethers.utils.hashMessage(message);
-       console.log("Message hash:", messageHash);
-       recoveredAddress = ethers.utils.verifyMessage(message, signature);
-       console.log("Recovered address:", recoveredAddress);
-     } catch (error) {
-       console.error("Invalid signature format:", error);
-       return res.status(400).json({ error: 'Invalid signature format' });
-     }
- 
-     if (recoveredAddress.toLowerCase() !== walletAddress.toLowerCase()) {
-       return res.status(400).json({ error: 'Invalid signature' });
-     }
- 
-     // Simulate fetching allowlist proof
-     const allowlistProof = getAllowlistProof(walletAddress);
- 
-     // Call the claim function
-     const tx = await contract.claim(
-       walletAddress,
-       quantity,
-       currency,
-       pricePerToken,
-       allowlistProof,
-       data,
-       {
-         value: ethers.BigNumber.from(pricePerToken).mul(ethers.BigNumber.from(quantity)),
-       }
-     );
-     await tx.wait();
- 
-     res.json({ transactionHash: tx.hash });
-   } catch (error) {
-     console.error(error);
-     res.status(500).json({ error: error.message });
-   }
- });
+    const { signedTx } = req.body;
+    
+    if (!signedTx) {
+      return res.status(400).json({ error: 'Signed transaction required' });
+    }
+
+    // Send the signed transaction
+    const txResponse = await provider.sendTransaction(signedTx);
+    const receipt = await txResponse.wait();
+
+    res.json({
+      transactionHash: txResponse.hash,
+      status: receipt.status === 1 ? 'success' : 'failed',
+      blockNumber: receipt.blockNumber
+    });
+  } catch (error) {
+    console.error('Transaction error:', error);
+    res.status(500).json({
+      error: error.message,
+      code: error.code
+    });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
