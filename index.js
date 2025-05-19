@@ -104,10 +104,10 @@ function getAllowlistProof(walletAddress) {
 
 provider.getNetwork().then((network) => {
   console.log("Chain ID:", network.chainId);
+  // Contract instance
+  const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 });
 
-// Contract instance
-const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
 app.post('/claim', async (req, res) => {
   try {
