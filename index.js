@@ -93,19 +93,19 @@ function getAllowlistProof(walletAddress) {
     return {
       proof: [],
       quantityLimitPerWallet: "0",
-      pricePerToken: "0",
+    pricePerToken: "0",
       currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
     };
   }
 }
 
 // Provider and signer
-
+let contract;
 
 provider.getNetwork().then((network) => {
   console.log("Chain ID:", network.chainId);
   // Contract instance
-  const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+  contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 });
 
 
