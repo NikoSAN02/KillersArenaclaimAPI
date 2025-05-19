@@ -110,9 +110,12 @@ app.post('/claim', async (req, res) => {
  
      // Verify the signature
      // Verify the signature
+     // Verify the signature
      let recoveredAddress;
      try {
-       const messageHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Claim message")); // Replace with the actual message used for signing
+       const message = "Claim message"; // The message used for signing
+       const messageHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(message));
+       console.log("Message Hash:", messageHash);
        console.log("Signature:", signature);
        recoveredAddress = ethers.utils.verifyMessage(ethers.utils.arrayify(messageHash), signature);
        console.log("Recovered address:", recoveredAddress);
