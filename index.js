@@ -82,7 +82,7 @@ const allowlist = {
     proof: [],
     quantityLimitPerWallet: "0",
     pricePerToken: "0",
-    currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
   },
 };
 
@@ -94,12 +94,17 @@ function getAllowlistProof(walletAddress) {
       proof: [],
       quantityLimitPerWallet: "0",
       pricePerToken: "0",
-      currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      currency: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
     };
   }
 }
+
 // Provider and signer
-const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+
+
+provider.getNetwork().then((network) => {
+  console.log("Chain ID:", network.chainId);
+});
 
 // Contract instance
 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
